@@ -23,8 +23,10 @@ import de.strullerbaumann.visualee.dependency.entity.DependencyType;
 import de.strullerbaumann.visualee.source.entity.JavaSource;
 import de.strullerbaumann.visualee.testdata.TestDataProvider;
 import java.util.Scanner;
+import org.junit.Rule;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -34,6 +36,8 @@ public class ExaminerTest {
 
    public ExaminerTest() {
    }
+   @Rule
+   public final ExpectedException exception = ExpectedException.none();
 
    @Test
    public void testIsRelevantType() {
@@ -365,6 +369,18 @@ public class ExaminerTest {
       javaSource.setSourceCode(sourceCode);
       Examiner.findAndSetPackage(javaSource);
       assertEquals("de.test1.test2.test3.test4", javaSource.getPackagePath());
+   }
+   @Test
+   public void testFindAndSetPackageInsufficientTokens() {
+      JavaSource javaSource;
+      String sourceCode;
+
+      javaSource = new JavaSource("MyTestClass");
+      sourceCode = "package";
+      javaSource.setSourceCode(sourceCode);
+      exception.expect(IllegalArgumentException.class);
+      exception.expectMessage("Insufficient number of tokens to set package");
+      Examiner.findAndSetPackage(javaSource);
    }
 
    public class ExaminerImpl extends Examiner {
